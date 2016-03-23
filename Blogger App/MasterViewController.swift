@@ -17,7 +17,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let appDel: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let context: NSManagedObjectContext = appDel.managedObjectContext
+        
         self.navigationItem.leftBarButtonItem = self.editButtonItem()
+        tableView.tableFooterView = UIView()
         
         let url = NSURL(string: "https://www.googleapis.com/blogger/v3/blogs/10861780/posts?key=AIzaSyB1uZUikh67DFuyCsjDkW8pTqPBWoZg3ro")!
         
@@ -30,6 +35,50 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                     //print(NSString(data: data, encoding: NSUTF8StringEncoding))
                     do{
                         let jsonResult = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
+                        if jsonResult.count > 0 {
+                            
+                            if let items = jsonResult["items"] as? NSArray {
+                                
+                                let request = NSFetchRequest(entityName: "BlogItems")
+                                request.returnsObjectsAsFaults = false
+                                
+                                do{
+                                    let results = try context.executeFetchRequest(request)
+                                    if results.count > 0 {
+                                        
+                                        for result in results {
+                                            
+                                            context.deleteObject(result as! NSManagedObject)
+                                            do{
+                                                
+                                                try context.save()
+                                            } catch {
+                                                print("Error in saving the data")
+                                            }
+                                            
+                                        }
+                                    }
+                                } catch {
+                                    print("error in fetching the request")
+                                }
+                                
+                                for item in items {
+                                    
+                                    if let title = item["title"] as? String {
+                                        
+                                        if let content = item["content"] as? String {
+                                            
+                                            let newPost: NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName("BlogItems", inManagedObjectContext: context)
+                                            newPost.setValue(title, forKey: "title")
+                                            newPost.setValue(content, forKey: "content")
+                                            
+                                            print(title)
+                                            print(content)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     } catch{
                         print("Error in JSON parsing")
                     }

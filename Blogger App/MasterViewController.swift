@@ -21,7 +21,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         let appDel: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let context: NSManagedObjectContext = appDel.managedObjectContext
         
-        self.navigationItem.leftBarButtonItem = self.editButtonItem()
         tableView.tableFooterView = UIView()
         
         let url = NSURL(string: "https://www.googleapis.com/blogger/v3/blogs/10861780/posts?key=AIzaSyB1uZUikh67DFuyCsjDkW8pTqPBWoZg3ro")!
@@ -88,8 +87,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             }
         }
         
-        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "insertNewObject:")
-        self.navigationItem.rightBarButtonItem = addButton
+        
         if let split = self.splitViewController {
             let controllers = split.viewControllers
             self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
@@ -124,7 +122,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     // MARK: - Table View
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return self.fetchedResultsController.sections?.count ?? 0
+        return 1
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
